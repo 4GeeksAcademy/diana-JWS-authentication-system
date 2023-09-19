@@ -111,16 +111,16 @@ def register():
 def login():
     body =  request.get_json(silent=True)
     if body is None:
-         raise APIException("Debes enviar informacion en el body", status_code=400)
+         raise APIException("Debes enviar informacion en el body", status_code=401)
     if "email" not in body:
-        raise APIException("Debes enviar el campo email", status_code=400)
+        raise APIException("Debes enviar el campo email", status_code=401)
     if "password" not in body:
-        raise APIException("Debes enviar tu contraseña", status_code=400)
+        raise APIException("Debes enviar tu contraseña", status_code=401)
     user_data = User.query.filter_by(email = body['email']).first()
     if user_data is None:
-        raise APIException("El usuario no existe", status_code=400)
+        raise APIException("El usuario no existe", status_code=404)
     if bcrypt.check_password_hash(user_data.password, body['password']) is False:
-        raise APIException("El usuario o la contraseña son inválidas", status_code=400)
+        raise APIException("El usuario o la contraseña son inválidas", status_code=401)
 
     access_token = create_access_token(identity=body['email'])
     return jsonify(access_token=access_token), 200

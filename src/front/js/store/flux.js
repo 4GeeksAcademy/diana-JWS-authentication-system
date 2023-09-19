@@ -16,6 +16,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 		actions: {
 
+			isPropertyEmpty: (obj) => {
+				for (const key in obj) {
+					if (obj[key] === "" || obj[key] == null || obj[key] === undefined) {
+						return true;
+					}
+				}
+				return false;
+			},
+
 			handleChange: e => {
 				setStore({ [e.target.name]: e.target.value })
 			},
@@ -81,11 +90,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			logInUser: async () => {
 				const store = getStore()
+				
+				if (!store.email || !store.password) {
+					alert("Por favor, complete todos los campos.");
+					return false; 
+				}
+
 				try {
 					const user = {
 						email: store.email,
 						password: store.password
 					}
+					
 
 					const response = await fetch(process.env.BACKEND_URL + "/login", {
 						method: 'POST',
@@ -95,7 +111,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						}
 					})
 					const result = await response.json()
-					console.log(result);
+					
 
 					if (response.ok) {
 						localStorage.setItem("jwt-token", result.access_token);
@@ -103,8 +119,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 						setStore({ hiddenLogout: true })
 						return true
 					} else {
-						setStore({ isLoged: false })
-						alert("Hubo un error, intente de nuevo")
+						if (response.status === 401) {
+							alert("Email o contraseña incorrectos. Por favor, inténtelo de nuevo.");
+							setStore({ isLoged: false })
+						} else if (response.status === 404) {
+								alert(result.message);
+								setStore({ isLoged: false })
+							} else {
+								alert("Hubo un error, intente de nuevo");
+								setStore({ isLoged: false });
+							}
+						
 					}
 
 				} catch (error) {

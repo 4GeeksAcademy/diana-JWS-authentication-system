@@ -15,7 +15,8 @@ const Login = () => {
   const handleLogin = () => {
 //    e.preventDefault()
     let response = actions.logInUser()
-    if (response){
+
+    if (store.isLoged){
       navigate('/private')
     }
   }
@@ -40,7 +41,7 @@ const Login = () => {
       <div className="text-center mt-2 mb-4">
 				<label className="">I don't have an account</label>
 				<Link to="/register">
-					<button className="btn text-secondary" onClick={() => actions.changeLoginButton(false)}>Sign Up</button>
+					<button className="btn text-secondary text-dark" onClick={() => actions.changeLoginButton(false)}>Sign Up</button>
 				</Link>
 			</div>
 

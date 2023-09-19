@@ -8,10 +8,11 @@ import "../../styles/home.css";
 const Private = () => {
     const { store, actions } = useContext(Context);
 	const navigate = useNavigate()
+
 	useEffect(()=>{
-		actions.private()
-		
+		actions.private()	
 	},[])
+
 	store.hiddenLogout ? actions.changeLogoutButton(false): null 
 
     
@@ -22,13 +23,14 @@ const Private = () => {
 				<h1 className="fw-bold fs-1 text-dark text-dark mt-2 d-flex justify-content-center"> Hola {store.userLoged.name}</h1>
 			</div>
 		);
-	} else
+	} else if (!store.isLoged) {
 		return (
 			<div className="container not-private mt-5">
                 <span className="text-white mt-2">Something went wrong, try again</span>
 				<img src="https://www.pngwing.com/es/free-png-znanx" className="d-flex align-items-center"></img>
 			</div>
 		)
+	}
 };
 
 export default Private;
