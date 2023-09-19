@@ -1,54 +1,158 @@
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			hiddenLogout: true,
+			tokenUser: null,
+			signup: false,
+			isLoged: false,
+			userLoged: {},
+
+			name: null,
+			last_name: null,
+			email: null,
+			password: null,
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+
+			handleChange: e => {
+				setStore({ [e.target.name]: e.target.value })
 			},
 
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
+
+			register: async () => {
+				const store = getStore()
+				const actions = getActions()
+				try {
+					let user = {}
+					if (store.name != null && store.last_name != null && store.email != null && store.password != null) {
+						user = {
+							name: store.name,
+							last_name: store.last_name,
+							email: store.email,
+							password: store.password,
+						}
+					}
+
+					const response = await fetch(process.env.BACKEND_URL + "/register", {
+						method: 'POST',
+						body: JSON.stringify(user),
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					})
+
+					const result = await response.json()
+					if (response.status == 400) {
+						setStore({signup:false})
+						alert(result.message)
+						
+					}
+
+					if (response.status == 404) {
+						setStore({ signup: false })
+						alert("All fields are required")
+						store.name = null,
+						store.last_name = null
+						store.email = null
+						store.password = null
+					}
+
+					if (result.msg == "ok") {
+						setStore({ signup: true })
+						setStore({ hiddenLogin: true })
+						alert("User added")
+					}
+
+
+				} catch (error) {
+					console.error(error); // Registra el error para la depuración
+					console.error("Error from backend: ", error.message);
+					setStore({ signup: false });
+
 				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+			changeSignUpStatus: (value) => {
+				setStore({ signup: value })
+			},
 
-				//reset the global store
-				setStore({ demo: demo });
-			}
+
+			logInUser: async () => {
+				const store = getStore()
+				try {
+					const user = {
+						email: store.email,
+						password: store.password
+					}
+
+					const response = await fetch(process.env.BACKEND_URL + "/login", {
+						method: 'POST',
+						body: JSON.stringify(user),
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					})
+					const result = await response.json()
+					console.log(result);
+
+					if (response.ok) {
+						localStorage.setItem("jwt-token", result.access_token);
+						setStore({ isLoged: true })
+						setStore({ hiddenLogout: true })
+						return true
+					} else {
+						setStore({ isLoged: false })
+						alert("Hubo un error, intente de nuevo")
+					}
+
+				} catch (error) {
+					console.log(error + " Error from backend")
+					setStore({ isLoged: false })
+				}
+
+			},
+
+			changeLogInStatus: (value) => {
+				setStore({ isLoged: value })
+			},
+
+			private: async () => {
+				const myToken = localStorage.getItem("jwt-token");
+				const store = getStore()
+				setStore({ tokenUser: myToken })
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/private", {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							'Authorization': 'Bearer ' + myToken
+						}
+					})
+					const result = await response.json()
+					console.log(result)
+					setStore({ userLoged: result.user })
+					setStore({ isLoged: true })
+
+				} catch (error) {
+					console.log(error + " Error from backend");
+					setStore({ isLoged: false })
+				}
+			},
+
+			changeLogoutButton: (value) => {
+				setStore({ hiddenLogout: value })
+			},
+
+			logout: () => {
+				setStore({ isLoged: false })
+				setStore({ hiddenLogout: true })
+				localStorage.clear();
+			},
 		}
-	};
+	}
 };
+
 
 export default getState;

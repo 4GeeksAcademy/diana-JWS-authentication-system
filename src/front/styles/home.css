@@ -5,3 +5,79 @@
     one more css for each page that will contain the selected used 
     on that page only (the ones not reused in other pages).
 */
+
+body {
+    background-image: url(https://www.gratistodo.com/wp-content/uploads/2021/12/Estrellas-gif-5.gif);
+    background-size: cover;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.general__card {
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.transparent__card {
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 53rem;
+    height: 28rem;
+        
+}
+
+.btn__register {
+    width: 8rem;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    padding: 0.7rem;
+    border: none;
+    color: antiquewhite;
+    background-color: #240c6a
+}
+
+.btn__register:hover {
+    transform: scale(1.1);
+    background-color: #16005A;
+    color: antiquewhite;
+
+}
+
+.btn__login {
+    width: 8rem;
+    border-radius: 1.5rem;
+    padding: 0.7rem;
+    border: none;
+    color: antiquewhite;
+    background-color: #240c6a
+}
+
+.btn__login:hover {
+    transform: scale(1.1);
+    background-color: #16005A
+}
+
+/* register */
+
+.register__card {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 40rem;
+    height: 35rem;
+    margin: 3rem auto;
+}
+
+.login__background {
+    background-color: rgba(255, 255, 255, 0.5);
+    max-width: 40%;
+    margin: 5rem auto;
+    padding: 2rem;
+   
+}
+
+.inputs {
+    max-width: 60%;
+    margin: 0 auto;
+}
+
+.little_letters {
+    font-size: 0.7rem;
+}
